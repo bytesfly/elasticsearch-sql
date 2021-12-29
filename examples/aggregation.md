@@ -1,6 +1,6 @@
 分组(或者分桶)聚合查询
 
-## group by
+## group by示例1
 
 SQL：
 
@@ -25,8 +25,8 @@ DSL：
   },
   "track_total_hits" : -1,
   "aggregations" : {
-    "cardinality_name" : {
-      "cardinality" : {
+    "count_name" : {
+      "value_count" : {
         "field" : "name"
       }
     },
@@ -84,6 +84,197 @@ DSL：
             }
           }
         }
+      }
+    }
+  }
+}
+```
+
+## group by示例2
+
+SQL：
+
+```sql
+select max(age) from student group by class;
+```
+
+DSL：
+
+```json
+{
+  "from" : 0,
+  "size" : 0,
+  "query" : {
+    "match_all" : {
+      "boost" : 1.0
+    }
+  },
+  "_source" : {
+    "includes" : [ ],
+    "excludes" : [ ]
+  },
+  "track_total_hits" : -1,
+  "aggregations" : {
+    "terms_class" : {
+      "terms" : {
+        "field" : "class",
+        "size" : 5000,
+        "min_doc_count" : 1,
+        "shard_min_doc_count" : 0,
+        "show_term_doc_count_error" : false,
+        "order" : [ {
+          "_count" : "desc"
+        }, {
+          "_key" : "asc"
+        } ]
+      }
+    },
+    "max_age" : {
+      "max" : {
+        "field" : "age"
+      }
+    }
+  }
+}
+```
+
+## group by示例3
+
+SQL：
+
+```sql
+select count(*) from student group by class;
+```
+
+DSL：
+
+```json
+{
+  "from" : 0,
+  "size" : 0,
+  "query" : {
+    "match_all" : {
+      "boost" : 1.0
+    }
+  },
+  "_source" : {
+    "includes" : [ ],
+    "excludes" : [ ]
+  },
+  "track_total_hits" : -1,
+  "aggregations" : {
+    "terms_class" : {
+      "terms" : {
+        "field" : "class",
+        "size" : 5000,
+        "min_doc_count" : 1,
+        "shard_min_doc_count" : 0,
+        "show_term_doc_count_error" : false,
+        "order" : [ {
+          "_count" : "desc"
+        }, {
+          "_key" : "asc"
+        } ]
+      }
+    },
+    "count_id" : {
+      "value_count" : {
+        "field" : "_id"
+      }
+    }
+  }
+}
+```
+
+## group by示例4
+
+SQL：
+
+```sql
+select count(distinct name) from student group by class;
+```
+
+DSL：
+
+```json
+{
+  "from" : 0,
+  "size" : 0,
+  "query" : {
+    "match_all" : {
+      "boost" : 1.0
+    }
+  },
+  "_source" : {
+    "includes" : [ ],
+    "excludes" : [ ]
+  },
+  "track_total_hits" : -1,
+  "aggregations" : {
+    "terms_class" : {
+      "terms" : {
+        "field" : "class",
+        "size" : 5000,
+        "min_doc_count" : 1,
+        "shard_min_doc_count" : 0,
+        "show_term_doc_count_error" : false,
+        "order" : [ {
+          "_count" : "desc"
+        }, {
+          "_key" : "asc"
+        } ]
+      }
+    },
+    "cardinality_name" : {
+      "cardinality" : {
+        "field" : "name"
+      }
+    }
+  }
+}
+```
+
+## group by示例5
+
+SQL：
+
+```sql
+select count(*), count(distinct name), max(age) from student where gender = '男';
+```
+
+DSL：
+
+```json
+{
+  "from" : 0,
+  "size" : 0,
+  "query" : {
+    "term" : {
+      "gender" : {
+        "value" : "男",
+        "boost" : 1.0
+      }
+    }
+  },
+  "_source" : {
+    "includes" : [ ],
+    "excludes" : [ ]
+  },
+  "track_total_hits" : -1,
+  "aggregations" : {
+    "count_id" : {
+      "value_count" : {
+        "field" : "_id"
+      }
+    },
+    "cardinality_name" : {
+      "cardinality" : {
+        "field" : "name"
+      }
+    },
+    "max_age" : {
+      "max" : {
+        "field" : "age"
       }
     }
   }
